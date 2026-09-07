@@ -1,0 +1,14 @@
+﻿# PDFs AR6 (regenerables via auto-download)
+data/raw/*.pdf
+# Chunks - ne pas committer (regen via Cell 4)
+data/processed/*.json
+# FAISS indexes - regenerables via Cell 6
+vectorstore/
+# Python
+.venv/
+__pycache__/
+.ipynb_checkpoints/
+*.pyc
+# OS
+.DS_Store
+Thumbs.db
