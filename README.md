@@ -31,3 +31,30 @@ pip install -r requirements.txt
 - [ ] Semaine 1: Ingestion Ch1
 - [ ] Semaine 2: RAG + LLM avec citations
 - [ ] Semaine 3: Module Fact-Check + Dashboard NLP
+
+## Pipeline
+PDF du GIEC
+    ↓
+Extraction texte
+    ↓
+Chunking
+    ↓
+~1341 chunks
+    ↓
+BAAI/bge-m3
+    ↓
+1341 embeddings
+    ↓
+Vector database
+    ↓
+Question utilisateur
+    ↓
+Embedding de la question
+    ↓
+Recherche des chunks similaires
+    ↓
+Top-k chunks
+    ↓
+LLM
+    ↓
+Réponse
