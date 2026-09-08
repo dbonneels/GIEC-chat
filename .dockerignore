@@ -1,0 +1,9 @@
+.git
+.gitignore
+.venv
+__pycache__
+.ipynb_checkpoints
+data/raw/*.pdf
+data/processed/*.json
+.env
+.DS_Store

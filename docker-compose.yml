@@ -1,0 +1,16 @@
+services:
+  giec-chat:
+    build: .
+    container_name: giec-chat
+    ports:
+      - "127.0.0.1:8501:8501"  # expose via Nginx, pas direct Internet
+    env_file:
+      - .env  # GROQ_API_KEY
+    volumes:
+      - ./vectorstore:/app/vectorstore:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
