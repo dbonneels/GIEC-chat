@@ -26,7 +26,7 @@ cp .env.example .env  # ajoute ta clé GROQ_API_KEY (https://console.groq.com/ke
 2. Cell 4 : installe depuis `requirements.txt` (`%pip install -r requirements.txt`)
 3. Cell 6 : ingestion full 1-12+SPM (auto-download depuis https://www.ipcc.ch/report/ar6/wg1/downloads/report/)
 4. Cell 7 : vectorisation `BAAI/bge-m3` -> `vectorstore/giec_wg1_all`
-5. Cell 12 : LLM Groq `llama-3.3-70b-versatile` (stream=True, clé via `.env` ou `userdata.get("GROQ_API_KEY")`, fallback `llama-3.1-8b-instant`)
+5. Cell 12 : LLM Groq `groq/compound` (stream=True, clé via `.env` ou `userdata.get("GROQ_API_KEY")`, fallback `qwen/qwen3.8-27b`)
 
 ## Usage - Webserver (Streamlit)
 ```bash
@@ -37,7 +37,7 @@ streamlit run app.py  # http://localhost:8501
 `app.py` est standalone : FAISS unifié + bge-m3 + Groq streaming + citations `[Source: WG1 Ch.X, p.Y]`.
 
 ## LLM Groq Cloud (gratuit)
-- Modèle primaire : `llama-3.3-70b-versatile` (131k ctx, 280 tps), fallback `llama-3.1-8b-instant` sur 429/quota
+- Modèle primaire : `groq/compound` (rapide, FR/EN), fallback `qwen/qwen3.8-27b` sur 429/quota
 - Clé gratuite sans CB : https://console.groq.com/keys -> `.env` ou `st.secrets["GROQ_API_KEY"]`
 - Env : `GROQ_API_KEY`, optionnel `GROQ_MODEL_PRIMARY/FALLBACK`
 

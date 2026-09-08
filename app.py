@@ -21,15 +21,15 @@ if not (VECTORSTORE_PATH / "index.faiss").exists():
     VECTORSTORE_PATH = Path("vectorstore/giec_wg1_ch1")
 
 EMBEDDING_MODEL = "BAAI/bge-m3"
-GROQ_MODEL_PRIMARY = "llama-3.3-70b-versatile"
-GROQ_MODEL_FALLBACK = "llama-3.1-8b-instant"
+GROQ_MODEL_PRIMARY = "groq/compound"
+GROQ_MODEL_FALLBACK = "qwen/qwen3.8-27b"
 
 SYSTEM_PROMPT_FR = """Tu es l'assistant GIEC. Réponds UNIQUEMENT avec le contexte fourni. Cite obligatoirement [Source: WG1 Ch.X/SPM, p.Y]. Si la réponse n'est pas dans le contexte, dis exactement "Non trouvé dans le rapport". N'invente rien. Réponds en français."""
 SYSTEM_PROMPT_EN = """You are the IPCC assistant. Answer ONLY from the provided context. Cite [Source: WG1 Ch.X/SPM, p.Y]. If not in context, say exactly "Not found in the report". Do not hallucinate. Answer in English."""
 
 st.set_page_config(page_title="GIEC Chat - AR6 WG1 (1-12+SPM)", layout="wide")
 st.title("🌍 GIEC Chat - AR6 WG1 (Ch.1-12 + SPM)")
-st.caption("RAG unifié FAISS + BAAI/bge-m3 + Groq llama-3.3-70b-versatile (stream)")
+st.caption("RAG unifié FAISS + BAAI/bge-m3 + Groq groq/compound (stream)")
 
 @st.cache_resource
 def load_db():
@@ -127,4 +127,4 @@ if query:
             with st.expander(f"Ch.{m['chapter']} p.{m['page']} [score={s:.3f}]"):
                 st.caption(f"{m['source']} — {m.get('chapter_title','')}")
                 st.write(t[:1000])
-        st.caption("Généré par Groq llama-3.3-70b-versatile (stream) — citations obligatoires.")
+        st.caption("Généré par Groq groq/compound (stream) — citations obligatoires.")
