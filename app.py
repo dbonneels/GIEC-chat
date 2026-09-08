@@ -75,22 +75,40 @@ def rechercher(query: str, k: int = 5):
 
 def repondre_stream(query: str, k: int = 5, temperature: float = 0):
     docs = rechercher(query, k=k)
-    contexte = "\n\n".join(f"[Source: {m['source']}, p.{m['page']}]\\n{t[:1500]}" for t, m, _ in docs)
     lang = detect_lang(query)
     system_prompt = SYSTEM_PROMPT_FR if lang == "fr" else SYSTEM_PROMPT_EN
-    messages = [
-        {"role": "system", "content": system_prompt},
-        {"role": "user", "content": f"Contexte:\\n{contexte}\\n\\nQuestion: {query}"}
-    ]
-    def call(model):
-        return client.chat.completions.create(model=model, messages=messages, temperature=temperature, max_tokens=800, stream=True)
+    def build_messages(docs_sub, max_chars=1000):
+        ctx = "\n\n".join(f"[Source: {m['source']}, p.{m['page']}]\n{t[:max_chars]}" for t, m, _ in docs_sub)
+        return [{"role": "system", "content": system_prompt}, {"role": "user", "content": f"Contexte:\n{ctx}\n\nQuestion: {query}"}]
+    # limite payload pour éviter 413
+    max_chars = 1000
+    if k > 5:
+        max_chars = 800
+    messages = build_messages(docs, max_chars)
+    # si contexte trop long, tronque
+    total_len = sum(len(m["content"]) for m in messages)
+    if total_len > 4500:
+        docs = docs[:3]
+        messages = build_messages(docs, 800)
+    def call(model, msgs):
+        return client.chat.completions.create(model=model, messages=msgs, temperature=temperature, max_tokens=600, stream=True)
     try:
-        stream = call(GROQ_MODEL_PRIMARY)
+        stream = call(GROQ_MODEL_PRIMARY, messages)
     except Exception as e:
         msg = str(e).lower()
-        if "rate" in msg or "429" in msg or "quota" in msg:
+        if "413" in msg or "request_too_large" in msg or "too large" in msg:
+            st.warning(f"Payload trop volumineux -> réduction k=3/800 chars")
+            docs = docs[:3]
+            msgs_retry = build_messages(docs, 800)
+            try:
+                stream = call(GROQ_MODEL_PRIMARY, msgs_retry)
+            except Exception as e2:
+                st.warning(f"Retry failed -> fallback {GROQ_MODEL_FALLBACK}")
+                stream = call(GROQ_MODEL_FALLBACK, msgs_retry)
+            return stream, docs
+        elif "rate" in msg or "429" in msg or "quota" in msg:
             st.warning(f"Quota {GROQ_MODEL_PRIMARY} atteint -> fallback {GROQ_MODEL_FALLBACK}")
-            stream = call(GROQ_MODEL_FALLBACK)
+            stream = call(GROQ_MODEL_FALLBACK, messages)
         else:
             raise
     return stream, docs
