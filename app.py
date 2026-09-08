@@ -84,16 +84,30 @@ footer{ visibility:hidden; }
 """, unsafe_allow_html=True)
 
 # --- Load DB
+# Progress bar helper
+def _progress(msg, pct):
+    try:
+        p = st.progress(pct, text=msg)
+        return p
+    except: return None
+
 @st.cache_resource
 def load_db():
     if not (VECTORSTORE_PATH / "index.faiss").exists():
         return None, None, None, None
+    # Streamlit progress for heavy load
+    prog = None
+    try:
+        prog = st.progress(10, text="Chargement index FAISS...")
+    except: pass
     index = faiss.read_index(str(VECTORSTORE_PATH / "index.faiss"))
+    if prog: prog.progress(50, text="Chargement chunks...")
     with open(VECTORSTORE_PATH / "chunks.json", encoding="utf-8") as f:
         data = json.load(f)
     texts = [d["text"] for d in data]
     metadatas = [d["metadata"] for d in data]
     model = SentenceTransformer(EMBEDDING_MODEL)
+    if prog: prog.progress(100, text="Prêt")
     return index, texts, metadatas, model
 
 index, texts, metadatas, embedder = load_db()
@@ -213,7 +227,9 @@ with right:
 
 # --- Answer
 if query:
-    stream, docs = repondre_stream(query, k=k)
+    with st.status("Recherche + génération Groq...", expanded=False) as status:
+        stream, docs = repondre_stream(query, k=k)
+        status.update(label="Contexte récupéré", state="complete")
     if sel != "Tous":
         docs = [d for d in docs if f"Ch.{d[1]['chapter']}" == sel]
 

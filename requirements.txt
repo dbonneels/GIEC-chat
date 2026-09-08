@@ -5,4 +5,5 @@ streamlit
 requests
 groq>=0.11
 python-dotenv
+tqdm
 
