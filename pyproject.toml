@@ -1,0 +1,24 @@
+[project]
+name = "giec-chat"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "faiss-cpu>=1.15.1",
+    "groq>=0.11",
+    "ipykernel<7",
+    "pypdf>=6.21.4",
+    "python-dotenv>=1.2.4",
+    "requests>=2.34.2",
+    "sentence-transformers>=6.2.0",
+    "streamlit>=1.66.1",
+    "tqdm>=4.70.1",
+]
+
+[project.scripts]
+giec-chat = "giec_chat:main"
+
+[build-system]
+requires = ["uv_build>=0.12.12,<0.13.0"]
+build-backend = "uv_build"
