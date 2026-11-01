@@ -60,7 +60,7 @@ p, label, div{ font-family:"Inter", system-ui, sans-serif; }
 .pills{ display:flex; flex-wrap:wrap; gap:8px; margin:10px 0 14px; }
 .pill{ font-family:"JetBrains Mono", monospace; font-size:11px; background:var(--glacial-light); color:var(--glacial-2); border:1px solid #CFFAFE; padding:6px 10px; border-radius:999px; cursor:pointer; }
 
-.cite{ color:#EA580C !important; font-style:italic !important; }
+.cite{ color:#EA580C !important; font-style:italic !important; font-size:12px !important; }
 
 /* Answer paper */
 .answer-wrap{ background:white; border:1px solid var(--line); border-radius:16px; overflow:hidden; box-shadow: 0 10px 30px rgba(15,23,42,0.07); }
@@ -82,6 +82,7 @@ p, label, div{ font-family:"Inter", system-ui, sans-serif; }
 [data-testid="stTextInput"] input{ border-radius:12px !important; border:1px solid var(--line) !important; padding:12px 14px !important; font-size:15px !important; }
 [data-testid="stSelectbox"] > div, [data-testid="stSlider"]{ background:white; border-radius:12px; }
 footer{ visibility:hidden; }
+[data-testid="stHorizontalBlock"]{ gap:0.25rem !important; }
 </style>
 """)
 
@@ -237,14 +238,13 @@ with right:
 </div>
 """, unsafe_allow_html=True)
     # Controls
-    c1, c2 = st.columns([1.3, 1])
-    with c1:
-        _lab, _dd = st.columns([1, 2], gap="small", vertical_alignment="center")
-        _lab.markdown("Chapitres que vous voulez explorer")
-        chapter_options = ["Tous"] + [f"Chapitre {c} - {CHAPTER_DESC.get(c, '')}" for c in chapters_sorted]
-        sel = _dd.selectbox("Chapitres que vous voulez explorer", chapter_options, label_visibility="collapsed")
-    with c2:
-        k = st.slider("Top-k", 3, 10, 5, label_visibility="collapsed")
+    c1, c2, c3, c4, c5 = st.columns([1.4, 2.7, 0.8, 2.2, 1], gap="small", vertical_alignment="center")
+    c1.markdown("Chapitres que vous voulez explorer :")
+    chapter_options = ["Tous"] + [f"Chapitre {c} - {CHAPTER_DESC.get(c, '')}" for c in chapters_sorted]
+    sel = c2.selectbox("Chapitres que vous voulez explorer :", chapter_options, label_visibility="collapsed")
+    c3.empty()
+    c4.markdown('<div style="text-align:right;">Nombre de passages récupérés (Top-k) :</div>', unsafe_allow_html=True)
+    k = c5.number_input("Top-k", min_value=3, max_value=10, value=5, step=1, label_visibility="collapsed")
     # Example pills
     st.markdown('<div class="pills">', unsafe_allow_html=True)
     examples = [
@@ -285,12 +285,11 @@ if query:
             delta = chunk.choices[0].delta.content
             if delta:
                 full += delta
-                rendered = re.sub(r'\[Source:([^]]+)\]', r'<span class="cite">&nbsp;&nbsp;&nbsp;&nbsp;Source:\1</span>', full)
+                rendered = re.sub(r'\[Source:([^]]+)\]', r'.<span class="cite">&nbsp;&nbsp;&nbsp;&nbsp;Source:\1</span>', full)
                 rendered = re.sub(r'(p\.\d+)\s*;\s*(AR6 WG1)', r'\1 & \2', rendered)
                 rendered = re.sub(r'\bp\.(\d+)', r'page \1', rendered)
-                rendered = re.sub(r'(Source:\s*[^<]*?page\s*\d+)\.', r'. \1', rendered)
-                rendered = re.sub(r'(?:\.\s*)?\s*<span class="cite">(\s*Source:.*?)</span>\.', r'. <span class="cite">\1</span>', rendered)
-                rendered = re.sub(r'<span class="cite">(\s*Source:.*?page \d+)\.', r'. <span class="cite">\1</span>', rendered)
+                rendered = re.sub(r'Ch\.(\d+)', r'Chapitre \1', rendered)
+                rendered = re.sub(r'\s+(\.<span class="cite">)', r'\1', rendered)
                 rendered = rendered.replace("</span>.", "</span>")
                 placeholder.markdown(rendered, unsafe_allow_html=True)
         if not full:
