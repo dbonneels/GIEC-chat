@@ -33,7 +33,7 @@ st.html("""
   --glacial:#0E7490; --glacial-2:#155E75; --glacial-light:#ECFEFF;
   --ember:#EA580C; --ember-light:#FFF7ED;
 }
-html, body, [data-testid="stAppViewContainer"]{ background:var(--paper); color:var(--ink); }
+html, body, [data-testid="stAppViewContainer"]{ background:linear-gradient(180deg, #000000 0%, #3b0a0a 60%, #be1e2d 100%); color:var(--ink); }
 [data-testid="stHeader"]{ background:transparent; }
 h1,h2,h3{ font-family:"Fraunces", serif !important; letter-spacing:-0.02em; }
 p, label, div{ font-family:"Inter", system-ui, sans-serif; }
@@ -82,6 +82,7 @@ p, label, div{ font-family:"Inter", system-ui, sans-serif; }
 [data-testid="stTextInput"] input{ border-radius:12px !important; border:1px solid var(--line) !important; padding:12px 14px !important; font-size:15px !important; }
 [data-testid="stSelectbox"] > div, [data-testid="stSlider"]{ background:white; border-radius:12px; }
 footer{ visibility:hidden; }
+.element-container{ margin:0 !important; padding:0 !important; }
 [data-testid="stHorizontalBlock"]{ gap:0.25rem !important; }
 </style>
 """)
@@ -239,11 +240,11 @@ with right:
 """, unsafe_allow_html=True)
     # Controls
     c1, c2, c3, c4, c5 = st.columns([1.4, 2.7, 0.8, 2.2, 1], gap="small", vertical_alignment="center")
-    c1.markdown("Chapitres que vous voulez explorer :")
+    c1.markdown('<div style="margin:-10px 0 0 0; padding:0; display:flex; align-items:center; min-height:2rem;">Chapitres que vous voulez explorer :</div>', unsafe_allow_html=True)
     chapter_options = ["Tous"] + [f"Chapitre {c} - {CHAPTER_DESC.get(c, '')}" for c in chapters_sorted]
     sel = c2.selectbox("Chapitres que vous voulez explorer :", chapter_options, label_visibility="collapsed")
     c3.empty()
-    c4.markdown('<div style="text-align:right;">Nombre de passages récupérés (Top-k) :</div>', unsafe_allow_html=True)
+    c4.markdown('<div style="text-align:right; margin-top:-10px;">Nombre de passages récupérés (Top-k) :</div>', unsafe_allow_html=True)
     k = c5.number_input("Top-k", min_value=3, max_value=10, value=5, step=1, label_visibility="collapsed")
     # Example pills
     st.markdown('<div class="pills">', unsafe_allow_html=True)
